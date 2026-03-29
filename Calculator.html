@@ -2,122 +2,149 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Calculator App</title>
+  <title>Advanced Calculator</title>
+
   <style>
     body {
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background: #1e1e2f;
-      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #141e30, #243b55);
+      font-family: 'Segoe UI', sans-serif;
     }
 
     .calculator {
-      background: #2c2c3e;
+      background: #1f2937;
       padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
 
     #display {
       width: 100%;
       height: 60px;
-      font-size: 24px;
-      margin-bottom: 10px;
+      font-size: 26px;
       text-align: right;
       padding: 10px;
       border: none;
-      border-radius: 5px;
+      border-radius: 10px;
       background: #000;
-      color: #0f0;
+      color: #00ffcc;
+      margin-bottom: 15px;
     }
 
     .buttons {
       display: grid;
       grid-template-columns: repeat(4, 70px);
-      gap: 10px;
+      gap: 12px;
     }
 
     button {
       height: 60px;
       font-size: 20px;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
-      background: #444;
+      background: #374151;
       color: white;
       transition: 0.2s;
     }
 
     button:hover {
-      background: #666;
+      background: #4b5563;
+      transform: scale(1.05);
+    }
+
+    .operator {
+      background: #2563eb;
     }
 
     .equal {
-      background: #28a745;
-    }
-
-    .equal:hover {
-      background: #3ecf5c;
+      background: #16a34a;
+      grid-column: span 2;
     }
 
     .clear {
-      background: #dc3545;
-    }
-
-    .clear:hover {
-      background: #ff4d5e;
+      background: #dc2626;
     }
   </style>
 </head>
+
 <body>
 
 <div class="calculator">
-  <input type="text" id="display" disabled>
+  <input type="text" id="display" readonly>
 
   <div class="buttons">
-    <button onclick="clearDisplay()" class="clear">C</button>
-    <button onclick="appendValue('/')">/</button>
-    <button onclick="appendValue('*')">*</button>
-    <button onclick="appendValue('-')">-</button>
+    <button class="clear" onclick="clearDisplay()">C</button>
+    <button onclick="backspace()">⌫</button>
+    <button class="operator" onclick="append('/')">/</button>
+    <button class="operator" onclick="append('*')">*</button>
 
-    <button onclick="appendValue('7')">7</button>
-    <button onclick="appendValue('8')">8</button>
-    <button onclick="appendValue('9')">9</button>
-    <button onclick="appendValue('+')">+</button>
+    <button onclick="append('7')">7</button>
+    <button onclick="append('8')">8</button>
+    <button onclick="append('9')">9</button>
+    <button class="operator" onclick="append('-')">-</button>
 
-    <button onclick="appendValue('4')">4</button>
-    <button onclick="appendValue('5')">5</button>
-    <button onclick="appendValue('6')">6</button>
-    <button onclick="calculate()" class="equal">=</button>
+    <button onclick="append('4')">4</button>
+    <button onclick="append('5')">5</button>
+    <button onclick="append('6')">6</button>
+    <button class="operator" onclick="append('+')">+</button>
 
-    <button onclick="appendValue('1')">1</button>
-    <button onclick="appendValue('2')">2</button>
-    <button onclick="appendValue('3')">3</button>
-    <button onclick="appendValue('0')">0</button>
+    <button onclick="append('1')">1</button>
+    <button onclick="append('2')">2</button>
+    <button onclick="append('3')">3</button>
+    <button onclick="append('0')">0</button>
 
-    <button onclick="appendValue('.')">.</button>
+    <button onclick="append('.')">.</button>
+    <button class="equal" onclick="calculate()">=</button>
   </div>
 </div>
 
 <script>
-  function appendValue(value) {
-    document.getElementById("display").value += value;
+  let display = document.getElementById("display");
+
+  function append(value) {
+    display.value += value;
   }
 
   function clearDisplay() {
-    document.getElementById("display").value = "";
+    display.value = "";
+  }
+
+  function backspace() {
+    display.value = display.value.slice(0, -1);
   }
 
   function calculate() {
     try {
-      let result = eval(document.getElementById("display").value);
-      document.getElementById("display").value = result;
+      let expression = display.value;
+
+      // Prevent invalid characters
+      if (!/^[0-9+\-*/.() ]+$/.test(expression)) {
+        display.value = "Error";
+        return;
+      }
+
+      display.value = Function("return " + expression)();
     } catch {
-      document.getElementById("display").value = "Error";
+      display.value = "Error";
     }
   }
+
+  // Keyboard Support
+  document.addEventListener("keydown", function(e) {
+    if (!isNaN(e.key) || "+-*/.".includes(e.key)) {
+      append(e.key);
+    } else if (e.key === "Enter") {
+      calculate();
+    } else if (e.key === "Backspace") {
+      backspace();
+    } else if (e.key === "Escape") {
+      clearDisplay();
+    }
+  });
 </script>
 
 </body>
